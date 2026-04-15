@@ -82,7 +82,29 @@ const customerUrl = (p) => `${APP_ORIGIN}/customer/${p.id}/${p.customerToken}`
 const vendorUrl = (p, v) => `${APP_ORIGIN}/vendor/${p.id}/${v.vendorToken}`
 const vendorStatus = (v) => v.customerResponse.status === 'unavailable' ? '再調整中' : v.customerResponse.status === 'selected' ? '日程確定' : v.candidates.length > 0 ? 'お客様回答待ち' : '候補日未登録'
 const projectStatus = (p) => !p.vendors.length ? '事業者未登録' : p.vendors.some(v => vendorStatus(v) === '再調整中') ? '再調整中あり' : p.vendors.every(v => vendorStatus(v) === '日程確定') ? '全社確定' : p.vendors.some(v => vendorStatus(v) === 'お客様回答待ち') ? 'お客様回答待ち' : '候補日未登録'
+const copyText = async (text) => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
 
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.left = '-9999px'
+    textarea.style.top = '0'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+
+    const success = document.execCommand('copy')
+    document.body.removeChild(textarea)
+    return success
+  } catch {
+    return false
+  }
+}
 export default function App() {
   const [route, setRoute] = useState(parseRoute())
   const [projects, setProjects] = useState([])
