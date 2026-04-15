@@ -185,7 +185,16 @@ function AdminProjectPage({ project, projects, onSave, onHome }) {
   const updateProject = (updater) => onSave(projects.map((item) => item.id === project.id ? updater(item) : item))
   const addVendor = () => { if (!vendorNameInput.trim()) return; updateProject((current) => ({ ...current, vendors:[...current.vendors, createVendor(vendorNameInput.trim())] })); setVendorNameInput('') }
   const enableCustomer = () => { if (!project.vendors.some((vendor) => vendor.candidates.length > 0)) return; updateProject((current) => ({ ...current, customerUrlEnabled: true })) }
-  const handleCopy = async (key, text) => { try { await copyText(text); setCopiedKey(key); setTimeout(()=>setCopiedKey(''), 1200) } catch {} }
+  const handleCopy = async (key, text) => {
+  const success = await copyText(text)
+
+  if (success) {
+    setCopiedKey(key)
+    setTimeout(() => setCopiedKey(''), 1500)
+  } else {
+    alert('URLをコピーできませんでした。もう一度お試しください。')
+  }
+}
 
   return <PageShell title={project.propertyName} subtitle={`案件管理番号：${project.caseNumber} / 工事名称：${project.workName}`} badge={projectStatus(project)} rightButton={<button className="ghost-btn" onClick={onHome}>案件一覧へ戻る</button>}>
     <div className="summary-grid">
